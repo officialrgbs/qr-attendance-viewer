@@ -5,19 +5,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const getLocalDate = () => {
   const now = new Date();
-  const offset = now.getTimezoneOffset(); // in minutes
+  const offset = now.getTimezoneOffset();
   const localTime = new Date(now.getTime() - offset * 60000);
   return localTime.toISOString().split("T")[0];
 };
-
-const TODAY = getLocalDate();
-
 
 function App() {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [selectedSection, setSelectedSection] = useState("Gregorio Y. Zara");
   const [attendanceMap, setAttendanceMap] = useState({});
+  const [selectedDate, setSelectedDate] = useState(getLocalDate()); 
+
 
   // Listen to all students
   useEffect(() => {
@@ -40,17 +39,17 @@ function App() {
     setFilteredStudents(filtered);
   }, [students, selectedSection]);
 
-  // Real-time attendance updates for filtered students
-  useEffect(() => {
-    const unsubscribes = [];
+ // Real-time attendance updates for filtered students
+useEffect(() => {
+  const unsubscribes = [];
 
-    filteredStudents.forEach((student) => {
-      const docRef = doc(db, "students", student.id, "attendance", TODAY);
-      const unsubscribe = onSnapshot(docRef, (snap) => {
-        setAttendanceMap((prevMap) => ({
+  filteredStudents.forEach((student) => {
+    const docRef = doc(db, "students", student.id, "attendance", selectedDate); // ✅
+    const unsubscribe = onSnapshot(docRef, (snap) => {
+      setAttendanceMap((prevMap) => ({
           ...prevMap,
           [student.id]: snap.exists() ? snap.data().status : "absent",
-        }));
+        }))
       });
 
       unsubscribes.push(unsubscribe);
@@ -71,22 +70,38 @@ function App() {
     <div className="min-h-screen bg-gradient-to-tr from-blue-50 to-purple-100 p-6">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
-          Attendance – <span className="text-indigo-600">{TODAY}</span>
+          Attendance – <span className="text-indigo-600">{selectedDate}</span>
         </h1>
 
-        <div className="mb-8">
-          <label className="block text-md font-medium text-gray-700 mb-2">
-            Filter by Section
-          </label>
-          <select
-            value={selectedSection}
-            onChange={(e) => setSelectedSection(e.target.value)}
-            className="w-full max-w-sm border border-indigo-300 bg-white shadow-sm rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-          >
-            <option value="Gregorio Y. Zara">Gregorio Y. Zara</option>
-            {/* Add more sections if needed */}
-          </select>
-        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+  <div>
+    <label className="block text-md font-medium text-gray-700 mb-2">
+      Filter by Section
+    </label>
+    <select
+      value={selectedSection}
+      onChange={(e) => setSelectedSection(e.target.value)}
+      className="w-full border border-indigo-300 bg-white shadow-sm rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+    >
+      <option value="Gregorio Y. Zara">Gregorio Y. Zara</option>
+    </select>
+  </div>
+          
+  <div>
+    <label className="block text-md font-medium text-gray-700 mb-2">
+      Select Date
+    </label>
+    <input
+      type="date"
+      value={selectedDate}
+      onChange={(e) => setSelectedDate(e.target.value)}
+      max={getLocalDate()}
+      className="w-full border border-indigo-300 bg-white shadow-sm rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+    />
+  </div>
+</div>
+
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* On Time */}
