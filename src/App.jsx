@@ -3,7 +3,15 @@ import { db } from "./firebase";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 
-const TODAY = new Date().toISOString().split("T")[0];
+const getLocalDate = () => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset(); // in minutes
+  const localTime = new Date(now.getTime() - offset * 60000);
+  return localTime.toISOString().split("T")[0];
+};
+
+const TODAY = getLocalDate();
+
 
 function App() {
   const [students, setStudents] = useState([]);
