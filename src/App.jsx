@@ -133,7 +133,11 @@ function App() {
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-4">
           Attendance – <span className="text-indigo-600">{selectedDate}</span>
         </h1>
-
+          <div className="flex justify-around text-gray-700 font-medium mb-6">
+            <div>Total: {filteredStudents.length}</div>
+            <div>Present: {filteredStudents.length - getTimeInCategory("Absent").length}</div>
+            <div>Absent: {getTimeInCategory("Absent").length}</div>
+          </div>
         <div className="flex justify-center space-x-4 mb-6">
           {["Time In", "Time Out"].map((m) => (
             <motion.button
