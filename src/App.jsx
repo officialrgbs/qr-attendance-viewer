@@ -10,8 +10,6 @@ const getLocalDate = () => {
   return localTime.toISOString().split("T")[0];
 };
 
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
 const isWeekend = (dateString) => {
   const day = new Date(dateString).getDay();
   return day === 0 || day === 6; // Sunday (0) or Saturday (6) Peak shit
